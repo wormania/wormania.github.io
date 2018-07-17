@@ -18,9 +18,6 @@ window.onload = function () {
              var emblems = parseInt(fileReader.result.match(/EMBLEM:\s*(\d+) Emblem/)[1]);
              //count emblems gained from end-of-story
              var storyEmblems = fileReader.result.match(/[\u0000]{16}(+)/);
-             if(storyEmblems != null){
-               storyEmblems = storyEmblems[0];
-             }
              console.log(storyEmblems);
              console.log(parseInt(emblems));
              //use the game's emblem count if it exists (post-ESG)
@@ -46,7 +43,10 @@ window.onload = function () {
              for(var rank in ranks){
                emblems += ranks[rank];
              }
-             emblems += (storyEmblems.match(//g) || []).length;
+             if(storyEmblems != null){
+               storyEmblems = storyEmblems[0];
+               emblems += (storyEmblems.match(//g) || []).length;
+             }             
              emblemCounter.innerText = emblems;
              console.log(ranks);
          }
