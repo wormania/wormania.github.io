@@ -5,7 +5,7 @@ window.onload = function () {
     var fileSelected = document.getElementById('savefile');
     fileSelected.addEventListener('change', function (e) {
       //repeat every 1s to automatically update
-      //window.setInterval(function() {
+      window.setInterval(function() {
          //Get the file object
          var saveFile = fileSelected.files[0];
          //Initialize the FileReader object to read the saveFile
@@ -52,7 +52,7 @@ window.onload = function () {
          }
          //()+
          fileReader.readAsText(saveFile);
-      //}, 1000);
+      }, 1000);
     }, false);
 }
  else {
