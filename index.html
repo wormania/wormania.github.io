@@ -63,17 +63,23 @@ window.onload = function () {
           }
 
           //count how many sets of 5 A-ranks there are for All A-rank Emblems
-          //Emblems achieved at 9, 14, 19, 24, 29, 30, and 31 with current route
-          //(Sonic except Green Forest 5, Shadow, Eggman, Tails, Rouge, Knuckles, Green Forest 5, Last)
+          //Emblems achieved at 9, 14, 23, 28, 29, 30, 31 with current route
+          //(Sonic except Green Forest 5, Shadow, Eggman, Tails except R101, Rouge, Knuckles, Green Forest 5, R101, Last)
           //Number of stages per character: Sonic 6, Shadow 4, the rest: 5)
-          var sets = fileReader.result.match(/\u0000\u0000\u0000[]{5}/g).length;
-          print(sets);
+          var sets = fileReader.result.match(/\u0000\u0000\u0000[]{5}/g);
           if(sets != null){
-            emblems += Math.floor(sets/5);
-            if(sets == 31){
-              emblems += 1;
-            }
+            setsCount = sets.length;
+          } else {
+            setsCount = 0;
           }
+          print(sets);
+          var allAs = [9, 14, 23, 28, 29, 30, 31];
+          allAs.forEach(function(count, i){
+            if(setsCount >= count){
+              emblems++;
+            }
+          });
+
 
           emblemCounter.innerText = emblems;
         }
