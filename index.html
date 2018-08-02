@@ -13,22 +13,22 @@ window.onload = function () {
         var fileReader = new FileReader();
         fileReader.onload = function (e) {
           var emblemCounter = document.getElementById('emblemCounter');
-          //matching hex code of 32 00 00 00 [01/02/03/04/05]{0-5 times}
-          var matches = fileReader.result.match(/2\u0000\u0000\u0000[]+/g);
           //see what the emblem count according to the game is
           var emblems = parseInt(fileReader.result.match(/EMBLEM:\s*(\d+) Emblem/)[1]);
-          console.log("Save File Emblems: " + emblems);
+          print("Save File Emblems: " + emblems);
           //use the game's emblem count if it exists (post-ESG)
-          if(emblems = 0){
+          if(emblems > 0){
             emblemCounter.innerText = emblems;
             return;
           }
+          //matching hex code of 32 00 00 00 [01/02/03/04/05]{1-5 times}
+          var matches = fileReader.result.match(/\u0000\u0000\u0000[\u0000]{4}/g);
+          print(matches);
           //no ranks found, 0 emblems
           if(matches == null){
             emblemCounter.innerText = 0;
             return;
           }
-          print(matches);
           var ranks = {"A": 0, "B": 0, "C": 0, "D": 0, "E": 0};
           matches.forEach(function(m){
             ranks["A"] += (m.match(//g) || []).length;
@@ -36,11 +36,12 @@ window.onload = function () {
             ranks["C"] += (m.match(//g) || []).length;
             ranks["D"] += (m.match(//g) || []).length;
             ranks["E"] += (m.match(//g) || []).length;
-            });
-          console.log(ranks);
+          });
+
           for(var rank in ranks){
             emblems += ranks[rank];
           }
+
           //count emblems gained from end-of-stories
           //hero story
           var hero = fileReader.result.match(/}.k\u001F/);
@@ -54,12 +55,26 @@ window.onload = function () {
             print("Dark complete");
             emblems += 1;
           }
-          ////last story, disabled as done after ESG is off
-          //var last = fileReader.result.match(/\u0000\u0000\u0000\u0000\u0000.\u000d/)
-          //if(last != null){
-          // print("Last complete");
-          //  emblems += 1;
-          //}
+          //last story
+          var last = fileReader.result.match(/\u0000\u0000\u0000\u0000\u0000.\u000d/)
+          if(last != null){
+            print("Last complete");
+            emblems += 1;
+          }
+
+          //count how many sets of 5 A-ranks there are for All A-rank Emblems
+          //Emblems achieved at 9, 14, 19, 24, 29, 30, and 31 with current route
+          //(Sonic except Green Forest 5, Shadow, Eggman, Tails, Rouge, Knuckles, Green Forest 5, Last)
+          //Number of stages per character: Sonic 6, Shadow 4, the rest: 5)
+          var sets = fileReader.result.match(/\u0000\u0000\u0000[]{5}/g).length;
+          print(sets);
+          if(sets != null){
+            emblems += Math.floor(sets/5);
+            if(sets == 31){
+              emblems += 1;
+            }
+          }
+
           emblemCounter.innerText = emblems;
         }
         fileReader.readAsText(saveFile);
@@ -105,7 +120,11 @@ function print(text){
 </style>
 <body>
   Please Select Save File, usually in: C:\Program Files (x86)\Steam\steamapps\common\Sonic Adventure 2\resource\gd_PC\SAVEDATA</br>
-  <input type="file" id="savefile" /></br></br></br></br>
+  <input type="file" id="savefile" />
+  <div>
+    <p>This will only work for speedrun files using the current ESG 180 route
+  </div>
+  </br></br></br></br>
   <div>
     <div id="emblemCounterText"><img src="emblemCounterText.png"></div>
     <div id="emblemCounter">0</div>
