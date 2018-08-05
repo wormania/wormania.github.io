@@ -1,6 +1,8 @@
 <script>
 debug = false;
+var emblemCounters;
 window.onload = function () {
+  emblemCounters = Array.from(document.getElementsByClassName('emblemCounter'));
   //Check the support for the File API support
   if (window.File && window.FileReader && window.FileList && window.Blob) {
     var fileSelected = document.getElementById('savefile');
@@ -12,13 +14,12 @@ window.onload = function () {
         //Initialize the FileReader object to read the saveFile
         var fileReader = new FileReader();
         fileReader.onload = function (e) {
-          var emblemCounter = document.getElementById('emblemCounter');
           //see what the emblem count according to the game is
           var emblems = parseInt(fileReader.result.match(/EMBLEM:\s*(\d+) Emblem/)[1]);
           print("Save File Emblems: " + emblems);
           //use the game's emblem count if it exists (post-ESG)
-          if(emblems > 0){
-            emblemCounter.innerText = emblems;
+          if(emblems = 0){
+            setEmblemText(emblems);
             return;
           }
           //matching hex code of 32 00 00 00 [01/02/03/04/05]{1-5 times}
@@ -26,7 +27,7 @@ window.onload = function () {
           print(matches);
           //no ranks found, 0 emblems
           if(matches == null){
-            emblemCounter.innerText = 0;
+            setEmblemText(0);
             return;
           }
           var ranks = {"A": 0, "B": 0, "C": 0, "D": 0, "E": 0};
@@ -63,7 +64,7 @@ window.onload = function () {
           }
 
           //count how many sets of 5 A-ranks there are for All A-rank Emblems
-          //Emblems achieved at 9, 14, 23, 28, 29, 30, 31 with current route
+          //Emblems achieved at 10, 15, 23, 28, 29, 30, 31 with current route
           //(CG, EE, Sonic except Green Forest 5, Shadow, Eggman, Tails except R101, Rouge, Knuckles, Green Forest 5, R101, Last)
           //Number of stages per character: Sonic 6, Shadow 4, the rest: 5)
           var sets = fileReader.result.match(/\u0000\u0000\u0000[]{5}/g);
@@ -74,14 +75,14 @@ window.onload = function () {
           }
           print(sets);
           var allAs = [10, 15, 23, 28, 29, 30, 31];
-          allAs.forEach(function(count, i){
+          allAs.forEach(function(count){
             if(setsCount >= count){
               emblems++;
             }
           });
 
 
-          emblemCounter.innerText = emblems;
+          setEmblemText(emblems);
         }
         fileReader.readAsText(saveFile);
       }, 1000);
@@ -92,6 +93,12 @@ window.onload = function () {
   }
 }
 
+function setEmblemText(emblems){
+  emblemCounters.forEach(function(counter){
+    counter.innerHTML = emblems + "/180";
+  });
+}
+
 function print(text){
   if(debug){
     console.log(text);
@@ -100,41 +107,55 @@ function print(text){
 
 </script>
 <style type="text/css">
-     body{
-       background-color: #181818;
-       color: white;
-     }
-     img{
-       float: left;
-       padding-left: 30px;
-     }
-     #emblemCounterText{
-       float: left;
-       padding-top: 5px;
-     }
-     #emblemCounter{
-       float: left;
-       padding-top: 3px;
-       padding-left: 50px;
-       font-size: 75px;
-     }
-     #oneeighty{
-       float: left;
-       padding-top: 3px;
-       font-size: 75px;
-     }
+@font-face { font-family: SEGA; src: url('NiseSega.ttf'); }
+body{
+  background-color: #181818;
+  color: white;
+  font-family: sans-serif;
+}
+div{
+  display:inline;
+  float: left;
+}
+.counterContainer{
+  width: 1500px;
+  margin: 80px;
+  float:left;
+}
+.emblemCounter{
+  font-size: 75px;
+  width: 330px;
+  text-align: center;
+}
+#emblemCounter2{
+  width: 450px;
+  padding-top: 10px;
+  font-size: 100px;
+  color: #2258e1;
+  font-family: SEGA;
+}
+#talonEmblem2{
+  padding-top: 8px;
+}
 </style>
 <body>
   Please Select Save File, usually in: C:\Program Files (x86)\Steam\steamapps\common\Sonic Adventure 2\resource\gd_PC\SAVEDATA</br>
   <input type="file" id="savefile" />
-  <div>
-    <p>This will only work for speedrun files using the current ESG 180 route
-  </div>
-  </br></br></br></br>
-  <div>
-    <div id="emblemCounterText"><img src="emblemCounterText.png"></div>
-    <div id="emblemCounter">0</div>
-    <div id="oneeighty">/180</div>
-    <img src="talonEmblem.png">
+  <div id="wrapper">
+    <div>
+      <p>This will only work for speedrun files using the current ESG 180 route: <a href=https://pastebin.com/kAXL1mcV>https://pastebin.com/kAXL1mcV</a>
+      <p>Both styles work, take your pick. Message me if you want something specific/changed
+    </div>
+    <div class="counterContainer">
+      <div class="emblemCounterTextImage"><img src="emblemCounterText.png"></div>
+      <div class="emblemCounter">0/180</div>
+      <img src="talonEmblem.png">
+    </div>
+
+    <div class="counterContainer">
+      <div class="emblemCounterTextImage"><img src="sega-emblemsText.png"></div>
+      <div class="emblemCounter" id="emblemCounter2">0/180</div>
+      <img src="talonEmblem.png" id="talonEmblem2">
+    </div>
   </div>
 </body>
