@@ -18,7 +18,7 @@ window.onload = function () {
           var emblems = parseInt(fileReader.result.match(/EMBLEM:\s*(\d+) Emblem/)[1]);
           print("Save File Emblems: " + emblems);
           //use the game's emblem count if it exists (post-ESG)
-          if(emblems = 0){
+          if(emblems > 0){
             setEmblemText(emblems);
             return;
           }
