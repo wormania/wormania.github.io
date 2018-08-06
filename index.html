@@ -1,6 +1,8 @@
 <script>
 debug = false;
 var emblemCounters;
+var rainbowText = false;
+var emblemDelay = 3000;
 window.onload = function () {
   emblemCounters = Array.from(document.getElementsByClassName('emblemCounter'));
   //Check the support for the File API support
@@ -19,7 +21,14 @@ window.onload = function () {
           print("Save File Emblems: " + emblems);
           //use the game's emblem count if it exists (post-ESG)
           if(emblems > 0){
-            setEmblemText(emblems);
+            setTimeout(setEmblemText, emblemDelay, emblems);
+            //only start rainbow if you go from 179 -> 180 emblems, not on loading practice 180 file
+            if(emblems == "179" && !rainbowText){
+              rainbowText = true;
+            } else if(emblems == "180" && rainbowText){
+              rainbowText = false;
+              setTimeout(startRainbowText, emblemDelay);
+            }
             return;
           }
           //matching hex code of 32 00 00 00 [01/02/03/04/05]{1-5 times}
@@ -80,8 +89,6 @@ window.onload = function () {
               emblems++;
             }
           });
-
-
           setEmblemText(emblems);
         }
         fileReader.readAsText(saveFile);
@@ -105,6 +112,22 @@ function print(text){
   }
 }
 
+function startRainbowText(){
+  var text = document.getElementsByClassName("emblemCounter");
+  var colors = [255, 0, 0];
+  var changingColor = 2;
+  var direction = 5;
+  window.setInterval(function(){
+    colors[changingColor] += direction;
+    if(colors[changingColor] == 255 || colors[changingColor] == 0){
+      changingColor = (changingColor+1)%3;
+      direction = direction*-1;
+    }
+    text[0].style.color = "rgb("+colors[0]+", "+colors[1]+", "+colors[2]+")";
+    text[1].style.color = "rgb("+colors[0]+", "+colors[1]+", "+colors[2]+")";
+  }, 10);
+}
+
 </script>
 <style type="text/css">
 @font-face { font-family: SEGA; src: url('NiseSega.ttf'); }
@@ -114,13 +137,13 @@ body{
   font-family: sans-serif;
 }
 div{
-  display:inline;
   float: left;
 }
 .counterContainer{
   width: 1500px;
   margin: 80px;
   float:left;
+  display:inline;
 }
 .emblemCounter{
   font-size: 75px;
@@ -140,12 +163,12 @@ div{
 </style>
 <body>
   Please Select Save File, usually in: C:\Program Files (x86)\Steam\steamapps\common\Sonic Adventure 2\resource\gd_PC\SAVEDATA</br>
-  <input type="file" id="savefile" />
+  <input type="file" id="savefile" /></br>
+  <div>
+    <p>This will only work for speedrun files using the current ESG 180 route: <a href=https://pastebin.com/kAXL1mcV>https://pastebin.com/kAXL1mcV</a>
+    <p>Both styles work, take your pick. Message me if you want something specific/changed
+  </div>
   <div id="wrapper">
-    <div>
-      <p>This will only work for speedrun files using the current ESG 180 route: <a href=https://pastebin.com/kAXL1mcV>https://pastebin.com/kAXL1mcV</a>
-      <p>Both styles work, take your pick. Message me if you want something specific/changed
-    </div>
     <div class="counterContainer">
       <div class="emblemCounterTextImage"><img src="emblemCounterText.png"></div>
       <div class="emblemCounter">0/180</div>
