@@ -31,8 +31,9 @@ window.onload = function () {
             }
             return;
           }
-          //matching hex code of 32 00 00 00 [01/02/03/04/05]{1-5 times}
-          var matches = fileReader.result.match(/\u0000\u0000\u0000[\u0000]{4}/g);
+          //matching hex code of 00 00 00 01 [01/02/03/04/05]{4 times}
+          //don't match it if there's a k first due to 2nd emblem showing on Hot Shot
+          var matches = fileReader.result.match(/[^k]\u0000\u0000\u0000[\u0000]{4}/g);
           print(matches);
           //no ranks found, 0 emblems
           if(matches == null){
@@ -161,6 +162,9 @@ div{
   padding-top: 8px;
 }
 </style>
+<head>
+  <title>Emblem Counter</title>
+</head>
 <body>
   Please Select Save File, usually in: C:\Program Files (x86)\Steam\steamapps\common\Sonic Adventure 2\resource\gd_PC\SAVEDATA</br>
   <input type="file" id="savefile" /></br>
