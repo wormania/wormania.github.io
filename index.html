@@ -33,7 +33,7 @@ window.onload = function () {
           }
           //matching hex code of 00 00 00 01 [01/02/03/04/05]{4 times}
           //don't match it if there's a k first due to 2nd emblem showing on Hot Shot
-          var matches = fileReader.result.match(/\u0000\u0000\u0000[\u0000]{4}/g);
+          var matches = fileReader.result.match(/[^k]\u0000\u0000\u0000[\u0000]{4}/g);
           print(matches);
           //no ranks found, 0 emblems
           if(matches == null){
