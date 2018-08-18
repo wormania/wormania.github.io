@@ -32,8 +32,7 @@ window.onload = function () {
             return;
           }
           //matching hex code of 00 00 00 01 [01/02/03/04/05]{4 times}
-          //don't match it if there's a k first due to 2nd emblem showing on Hot Shot
-          var matches = fileReader.result.match(/[^k]\u0000\u0000\u0000[\u0000]{4}/g);
+          var matches = fileReader.result.match(/\u0000\u0000\u0000[\u0000]{4}/g);
           print(matches);
           //no ranks found, 0 emblems
           if(matches == null){
@@ -42,6 +41,21 @@ window.onload = function () {
           }
           var ranks = {"A": 0, "B": 0, "C": 0, "D": 0, "E": 0};
           matches.forEach(function(m){
+            var lastFive = m.substring(3); //get just the rank symbols and null characters
+            var rankCount = lastFive.match(/[]+/g); //match rank symbols
+            rankCount = rankCount.toString().replace(/,/g, ""); //crush results down to a single string and remove commas
+            rankCount = (rankCount.match(/[]+/g)[0] || []).length; //search and get the length ([0] as there's only one result due to searching the crushed result-list)
+            var endingNulls = lastFive.substring(rankCount); //get the end of the string which *should* be all nulls based on the number of ranks counted
+            if(endingNulls.length > 0){
+              var allNulls = "\u0000".repeat(endingNulls.length); //make a new all-null string with equal length
+              //check that the expected null string matches our clean null string (if not, that means some of the ranks we found were out of order and therefore they are not a correct match for the emblems)
+              if(endingNulls === allNulls){
+                //continue
+              } else {
+                //do not add the found emblem ranks
+                return;
+              }
+            }
             ranks["A"] += (m.match(//g) || []).length;
             ranks["B"] += (m.match(//g) || []).length;
             ranks["C"] += (m.match(//g) || []).length;
@@ -170,7 +184,7 @@ div{
   <input type="file" id="savefile" /></br>
   <div>
     <p>This will only work for speedrun files using the current ESG 180 route: <a href=https://pastebin.com/kAXL1mcV>https://pastebin.com/kAXL1mcV</a>
-    <p>Both styles work, take your pick. Message me if you want something specific/changed
+    <p>Version 0.2: Maybe hotshot works now, also should keep track of emblems earnt in a stage even if you get a not-A rank
   </div>
   <div id="wrapper">
     <div class="counterContainer">
