@@ -2,7 +2,9 @@
 debug = false;
 var emblemCounters;
 var rainbowText = false;
+var hotshotFixed = false;
 var emblemDelay = 8700;
+var lastFile = "";
 window.onload = function () {
   emblemCounters = Array.from(document.getElementsByClassName('emblemCounter'));
   //Check the support for the File API support
@@ -16,6 +18,11 @@ window.onload = function () {
         //Initialize the FileReader object to read the saveFile
         var fileReader = new FileReader();
         fileReader.onload = function (e) {
+
+          if(fileReader.result != lastFile){
+            console.log("test");
+            hotshotFixed = true;
+          }
           //see what the emblem count according to the game is
           var emblems = parseInt(fileReader.result.match(/EMBLEM:\s*(\d+) Emblem/)[1]);
           print("Save File Emblems: " + emblems);
@@ -37,6 +44,7 @@ window.onload = function () {
           //no ranks found, 0 emblems
           if(matches == null){
             setEmblemText(0);
+            hotshotFix = false;
             return;
           }
           var ranks = {"A": 0, "B": 0, "C": 0, "D": 0, "E": 0};
@@ -104,6 +112,10 @@ window.onload = function () {
               emblems++;
             }
           });
+          if(emblems == 2 && !hotshotFixed){
+            emblems = 1;
+            lastFile = fileReader.result;
+          }
           setEmblemText(emblems);
         }
         fileReader.readAsText(saveFile);
@@ -184,7 +196,7 @@ div{
   <input type="file" id="savefile" /></br>
   <div>
     <p>This will only work for speedrun files using the current ESG 180 route: <a href=https://pastebin.com/kAXL1mcV>https://pastebin.com/kAXL1mcV</a>
-    <p>Version 0.2: Maybe hotshot works now, also should keep track of emblems earnt in a stage even if you get a not-A rank
+    <p>Version 0.3 (experimental): Brute-force fix for hotshot, maybe this works
   </div>
   <div id="wrapper">
     <div class="counterContainer">
