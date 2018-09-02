@@ -11,18 +11,18 @@ window.onload = function () {
   if (window.File && window.FileReader && window.FileList && window.Blob) {
     var fileSelected = document.getElementById('savefile');
     fileSelected.addEventListener('change', function (e) {
-      //repeat every 1s to automatically update
+      //repeat every 0.1s to automatically update
       window.setInterval(function() {
         //Get the file object
         var saveFile = fileSelected.files[0];
         //Initialize the FileReader object to read the saveFile
         var fileReader = new FileReader();
         fileReader.onload = function (e) {
-
-          if(fileReader.result != lastFile){
-            console.log("test");
-            hotshotFixed = true;
+          //check if save file has changed
+          if(fileReader.result == lastFile){
+            return;
           }
+          lastFile = fileReader.result;
           //see what the emblem count according to the game is
           var emblems = parseInt(fileReader.result.match(/EMBLEM:\s*(\d+) Emblem/)[1]);
           print("Save File Emblems: " + emblems);
@@ -41,10 +41,11 @@ window.onload = function () {
           //matching hex code of 00 00 00 01 [01/02/03/04/05]{4 times}
           var matches = fileReader.result.match(/\u0000\u0000\u0000[\u0000]{4}/g);
           print(matches);
-          //no ranks found, 0 emblems
+          //no ranks found, 0 emblems, reset everything
           if(matches == null){
             setEmblemText(0);
             hotshotFix = false;
+            lastFile = "";
             return;
           }
           var ranks = {"A": 0, "B": 0, "C": 0, "D": 0, "E": 0};
@@ -114,12 +115,12 @@ window.onload = function () {
           });
           if(emblems == 2 && !hotshotFixed){
             emblems = 1;
-            lastFile = fileReader.result;
+            hotshotFixed = true;
           }
           setEmblemText(emblems);
         }
         fileReader.readAsText(saveFile);
-      }, 1000);
+      }, 100);
     }, false);
   }
   else {
@@ -187,16 +188,19 @@ div{
 #talonEmblem2{
   padding-top: 8px;
 }
+
 </style>
 <head>
   <title>Emblem Counter</title>
 </head>
 <body>
-  Please Select Save File, usually in: C:\Program Files (x86)\Steam\steamapps\common\Sonic Adventure 2\resource\gd_PC\SAVEDATA</br>
-  <input type="file" id="savefile" /></br>
-  <div>
-    <p>This will only work for speedrun files using the current ESG 180 route: <a href=https://pastebin.com/kAXL1mcV>https://pastebin.com/kAXL1mcV</a>
-    <p>Version 0.3 (experimental): Brute-force fix for hotshot, maybe this works
+  <div id="info">
+    Please Select Save File, usually in: C:\Program Files (x86)\Steam\steamapps\common\Sonic Adventure 2\resource\gd_PC\SAVEDATA</br>
+    <input type="file" id="savefile" /></br>
+    <div>
+      <p>This will only work for speedrun files using the current ESG 180 route: <a href=https://pastebin.com/kAXL1mcV>https://pastebin.com/kAXL1mcV</a>
+      <p>Version 0.32 (experimental): Brute-force fix for hotshot attempt #3
+    </div>
   </div>
   <div id="wrapper">
     <div class="counterContainer">
